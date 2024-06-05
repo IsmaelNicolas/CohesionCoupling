@@ -1,5 +1,5 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :update, :destroy]
+  before_action :set_task, only: [:show, :update, :destroy, :start, :complete]
 
   # GET /tasks
   def index
@@ -38,13 +38,31 @@ class TasksController < ApplicationController
     head :no_content
   end
 
+  # PATCH /tasks/:id/start
+  def start
+    if @task.in_progress!
+      render json: @task
+    else
+      render json: @task.errors, status: :unprocessable_entity
+    end
+  end
+
+  # PATCH /tasks/:id/complete
+  def complete
+    if @task.completed!
+      render json: @task
+    else
+      render json: @task.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
-    def set_task
-      @task = Task.find(params[:id])
-    end
+  def set_task
+    @task = Task.find(params[:id])
+  end
 
-    def task_params
-      params.require(:task).permit(:title, :description)
-    end
+  def task_params
+    params.require(:task).permit(:title, :description, :status)
+  end
 end
