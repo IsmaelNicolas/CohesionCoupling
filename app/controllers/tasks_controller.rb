@@ -1,11 +1,11 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :update, :destroy, :start, :complete]
-
+  before_action :set_project
   # GET /tasks
-  def index
-    @tasks = Task.all
-    render json: @tasks
-  end
+  # def index
+  #   @tasks = Task.all
+  #   render json: @tasks
+  # end
 
   # GET /tasks/:id
   def show
@@ -13,15 +13,15 @@ class TasksController < ApplicationController
   end
 
   # POST /tasks
-  def create
-    @task = Task.new(task_params)
+  # def create
+  #   @task = Task.new(task_params)
 
-    if @task.save
-      render json: @task, status: :created, location: @task
-    else
-      render json: @task.errors, status: :unprocessable_entity
-    end
-  end
+  #   if @task.save
+  #     render json: @task, status: :created, location: @task
+  #   else
+  #     render json: @task.errors, status: :unprocessable_entity
+  #   end
+  # end
 
   # PATCH/PUT /tasks/:id
   def update
@@ -56,6 +56,23 @@ class TasksController < ApplicationController
     end
   end
 
+  # GET /projects/:project_id/tasks
+  def index
+    @tasks = @project.tasks
+    render json: @tasks
+  end
+
+  # POST /projects/:project_id/tasks
+  def create
+    @task = @project.tasks.build(task_params)
+
+    if @task.save
+      render json: @task, status: :created, location: @task
+    else
+      render json: @task.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_task
@@ -64,5 +81,9 @@ class TasksController < ApplicationController
 
   def task_params
     params.require(:task).permit(:title, :description, :status)
+  end
+
+  def set_project
+    @project = Project.find(params[:project_id])
   end
 end
